@@ -56,7 +56,6 @@ public class JpaApplication {
 }
 
 interface CustomerRepository extends JpaRepository<Customer, Long>{
-    void removeAllByIdIn(Collection<Long> ids);
 }
 
 @Entity
