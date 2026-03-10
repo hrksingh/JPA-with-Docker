@@ -2,7 +2,9 @@ package org.ash.jpa;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.*;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,10 +12,7 @@ import org.springframework.boot.jdbc.autoconfigure.JdbcConnectionDetails;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 
 @SpringBootApplication
@@ -41,15 +40,15 @@ public class JpaApplication {
 
             IO.println(details);
 
-            Set.of("A", "B").forEach(name -> customerRepository.save(new Customer(null, name)));
-            List<Customer> records= customerRepository.findAll();
-            records.forEach(IO::println);
+            customerRepository.deleteAll();
 
-//
-//            List<Long> ids = records.stream()
-//                    .map(Customer::getId)
-//                    .collect(Collectors.toList());
-//            customerRepository.deleteAllById(ids);
+            customerRepository.saveAll(List.of(
+                    new Customer("A"),
+                    new Customer("B")
+            ));
+
+            customerRepository.findAll().forEach(IO::println);
+
         };
     }
 
@@ -58,59 +57,33 @@ public class JpaApplication {
 interface CustomerRepository extends JpaRepository<Customer, Long>{
 }
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity
 class  Customer{
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    public Customer(Long id, String name) {
-        this.id = id;
+    public Customer(String name) {
         this.name = name;
     }
 
-    public Customer() {
 
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Customer customer)) return false;
+        return id != null && id.equals(customer.id);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Customer customer = (Customer) o;
-        return Objects.equals(getId(), customer.getId()) && Objects.equals(getName(), customer.getName());
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hashCode(getId());
-        result = 31 * result + Objects.hashCode(getName());
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
+    public final int hashCode() {
+        return getClass().hashCode();
     }
 }
