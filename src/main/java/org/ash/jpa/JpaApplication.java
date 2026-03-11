@@ -2,9 +2,7 @@ package org.ash.jpa;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.*;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,7 +12,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-
 @SpringBootApplication
 public class JpaApplication {
 
@@ -23,15 +20,15 @@ public class JpaApplication {
     }
 
     @Bean
-    ApplicationRunner runner(CustomerRepository customerRepository, JdbcConnectionDetails jdbc){
+    ApplicationRunner runner(CustomerRepository customerRepository, JdbcConnectionDetails jdbc) {
         return _ -> {
 
             var details = """
-        class: %s
-        JDBC: %s
-        userName: %s
-        password: %s
-        """.formatted(
+                    class: %s
+                    JDBC: %s
+                    userName: %s
+                    password: %s
+                    """.formatted(
                     jdbc.getClass().getName(),
                     jdbc.getJdbcUrl(),
                     jdbc.getUsername(),
@@ -54,26 +51,45 @@ public class JpaApplication {
 
 }
 
-interface CustomerRepository extends JpaRepository<Customer, Long>{
-}
+interface CustomerRepository extends JpaRepository<Customer, Long> {}
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@ToString
 @Entity
-class  Customer{
+class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
     private String name;
+
+    public Customer() {}
 
     public Customer(String name) {
         this.name = name;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 
     @Override
     public final boolean equals(Object o) {
